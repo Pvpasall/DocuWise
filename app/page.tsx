@@ -26,6 +26,9 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalyseResult | null>(null);
 
+  // Étape courante du parcours (pour le fil d'étapes en haut).
+  const step = result ? 3 : loading || preview ? 2 : 1;
+
   async function handleFile(file: File) {
     setError(null);
     setResult(null);
@@ -96,11 +99,11 @@ export default function Home() {
       </header>
 
       <div className="process-strip" aria-label="Parcours DocuWise">
-        <div className="process-item active"><span>01</span><div><strong>Décrivez votre situation</strong><small>Quelques informations utiles</small></div></div>
-        <div className="process-line" />
-        <div className="process-item"><span>02</span><div><strong>Importez un document</strong><small>PDF, JPG ou PNG</small></div></div>
-        <div className="process-line" />
-        <div className="process-item"><span>03</span><div><strong>Recevez votre feuille de route</strong><small>Explication, pièces et alertes</small></div></div>
+        <div className={stepClass(1, step)}><span>{step > 1 ? "✓" : "01"}</span><div><strong>Décrivez votre situation</strong><small>Quelques informations utiles</small></div></div>
+        <div className={`process-line ${step > 1 ? "filled" : ""}`} />
+        <div className={stepClass(2, step)}><span>{step > 2 ? "✓" : "02"}</span><div><strong>Importez un document</strong><small>PDF, JPG ou PNG</small></div></div>
+        <div className={`process-line ${step > 2 ? "filled" : ""}`} />
+        <div className={stepClass(3, step)}><span>03</span><div><strong>Recevez votre feuille de route</strong><small>Explication, pièces et alertes</small></div></div>
       </div>
 
       <div className="workspace-grid">
@@ -185,7 +188,20 @@ export default function Home() {
 
           {loading && (
             <div className="loading-panel">
-              <span className="loader-ring" /><div><strong>DocuWise lit votre document</strong><span>{status || "Traitement…"}</span></div>
+              <span className="loader-ring" />
+              <div className="loading-copy">
+                <strong>DocuWise lit votre document</strong>
+                <span className="loading-status">{status || "Traitement…"}</span>
+                <div className="loading-steps">
+                  <span className="on">Extraction du texte</span>
+                  <span className="sep">→</span>
+                  <span className={status && status.includes("IA") ? "on" : ""}>
+                    Analyse
+                  </span>
+                  <span className="sep">→</span>
+                  <span>Feuille de route</span>
+                </div>
+              </div>
             </div>
           )}
 
@@ -207,6 +223,12 @@ export default function Home() {
       </footer>
     </main>
   );
+}
+
+function stepClass(index: number, current: number): string {
+  if (index < current) return "process-item done";
+  if (index === current) return "process-item active";
+  return "process-item";
 }
 
 function FileDrop({

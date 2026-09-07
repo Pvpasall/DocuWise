@@ -103,16 +103,28 @@ body {
 .result-card { padding: 21px 24px; }
 .result-card-title { margin-bottom: 14px; color: var(--ink); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
 .result-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.result-field { display: flex; min-height: 67px; align-items: center; justify-content: space-between; gap: 9px; padding: 10px 12px; border: 1px solid #e4eae7; background: #fafbf9; }
+.result-field { display: flex; min-height: 67px; align-items: center; justify-content: space-between; gap: 9px; padding: 10px 12px; border: 1px solid #e4eae7; border-radius: 5px; background: #fafbf9; transition: border-color .2s, background .2s; }
+.result-field:hover { border-color: #c9d8cf; background: #f5f9f4; }
+.result-field-main { min-width: 0; }
 .result-field-label { color: var(--muted); font-size: 10px; }
-.result-field-value { margin-top: 5px; color: var(--ink); font-size: 12px; }
-.result-field .rounded-full { flex: none; background: #e4f0e7; color: var(--green); font-size: 9px; }
+.result-field-value { margin-top: 5px; color: var(--ink); font-size: 12px; word-break: break-word; }
+.copy-btn { flex: none; align-self: flex-start; border: 1px solid #d5dfdc; border-radius: 4px; background: white; padding: 4px 8px; color: var(--muted); font-family: inherit; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; transition: all .2s; }
+.copy-btn:hover { border-color: var(--blue); color: var(--blue); }
+.copy-btn.copied { border-color: #9bc0aa; background: #e6f1e9; color: var(--green); }
 .result-note { margin-top: 14px; color: #8b9998; font-size: 10px; line-height: 1.5; }
-.result-checklist { display: grid; gap: 0; }
-.result-checklist li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; padding: 10px 0; border-top: 1px solid #edf0ee; font-size: 12px; }
+.checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.checklist-count { color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+.checklist-progress { position: relative; height: 4px; margin: 12px 0 6px; border-radius: 4px; background: #e9eeeb; overflow: hidden; }
+.checklist-progress span { position: absolute; inset: 0 auto 0 0; border-radius: 4px; background: linear-gradient(90deg, #6fa585, var(--green)); transition: width .45s cubic-bezier(.2,.8,.2,1); }
+.result-checklist { display: grid; gap: 0; margin-top: 6px; }
+.result-checklist li { display: grid; grid-template-columns: 22px 1fr; align-items: start; gap: 10px; padding: 11px 0; border-top: 1px solid #edf0ee; font-size: 12px; }
 .result-checklist li:first-child { border-top: 0; }
-.checkmark { display: grid; place-items: center; width: 19px; height: 19px; border: 1px solid #cad4d0; border-radius: 50%; color: #93a19d; font-size: 12px; }
-.checkmark.required { border-color: #9bc0aa; background: #e6f1e9; color: var(--green); }
+.checkmark { display: grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 1px solid #cad4d0; border-radius: 50%; background: white; color: #93a19d; font-size: 12px; font-family: inherit; cursor: pointer; transition: all .18s; }
+.checkmark:hover { border-color: var(--green); transform: scale(1.08); }
+.checkmark.required { border-color: #9bc0aa; background: #f0f6f2; }
+.checkmark.checked { border-color: var(--green); background: var(--green); color: white; }
+.check-body { display: block; }
+.check-body.is-done .check-name { color: #9aa5a1; text-decoration: line-through; }
 .check-name { color: var(--ink); font-weight: 700; }
 .optional { color: #9aa5a1; font-size: 10px; }
 .check-note { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
@@ -124,7 +136,32 @@ body {
 .ocr-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 15px 19px; border: 0; background: white; color: var(--muted); font-family: inherit; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
 .ocr-toggle span { color: var(--blue); font-size: 20px; font-weight: 400; }
 .ocr-text { max-height: 288px; overflow: auto; margin: 0; border-top: 1px solid var(--line); padding: 17px 19px; white-space: pre-wrap; color: #54646c; font-family: monospace; font-size: 10px; line-height: 1.6; }
-.result-stack > .rounded-xl { border-radius: 0; border-color: var(--line); background: #f0f3f0; box-shadow: none; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.limits-card { border: 1px solid var(--line); background: #f0f3f0; padding: 14px 18px; color: var(--muted); font-size: 10px; line-height: 1.6; }
+.limits-card strong { color: #55655d; }
+
+/* Badges */
+.badge { display: inline-block; border-radius: 3px; padding: 5px 8px; font-size: 10px; font-weight: 700; }
+.badge-slate { background: #f0f2ef; color: var(--muted); }
+.badge-brand { background: var(--blue-soft); color: var(--blue); }
+.badge-green { background: #e4f0e7; color: var(--green); }
+
+/* Apparition en fondu des cartes de résultat */
+.reveal { opacity: 0; transform: translateY(10px); animation: reveal-up .5s cubic-bezier(.2,.8,.2,1) forwards; }
+@keyframes reveal-up { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .reveal { animation: none; opacity: 1; transform: none; } }
+
+/* Chargement multi-étapes */
+.loading-copy { display: flex; flex-direction: column; }
+.loading-status { margin-top: 5px; color: var(--muted); font-size: 11px; }
+.loading-steps { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: #b3bdbd; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.loading-steps .on { color: var(--blue); }
+.loading-steps .sep { color: #cdd6d6; font-weight: 400; }
+
+/* Fil d'étapes : état terminé */
+.process-item.done { color: var(--green); }
+.process-item.done > span { display: grid; place-items: center; width: 19px; height: 19px; border-radius: 50%; background: #e6f1e9; color: var(--green); font-family: "Trebuchet MS", sans-serif; font-size: 11px; }
+.process-line.filled { background: linear-gradient(90deg, #9bc0aa, var(--line)); }
+
 @media (max-width: 560px) { .result-fields { grid-template-columns: 1fr; } .result-hero { padding: 20px; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 
