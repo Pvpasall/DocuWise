@@ -22,15 +22,13 @@ pré-remplissage — sans jamais remplacer l'administration.
 
 - **Next.js 14** (App Router) + **Tailwind CSS**
 - **OCR local, gratuit** : couche texte des PDF via **pdfjs-dist**, OCR des images / PDF scannés via **Tesseract.js** (aucun token consommé)
-- **Groq** (tier gratuit) avec un **modèle texte** (défaut `llama-3.3-70b-versatile`) pour l'explication et le guidage
+- **Gemini** (quota gratuit) avec un **modèle texte** (défaut `gemini-2.5-flash-lite`) pour l'explication et le guidage
 
 ### Pourquoi OCR local + modèle texte (et pas un modèle vision) ?
 
-Le tier gratuit de Groq impose des limites strictes de tokens/minute. Envoyer
-l'image au modèle (vision) fait exploser ces limites (erreurs 429) et impose un
-modèle vision. En faisant l'**OCR en local** et en n'envoyant que le **texte
-extrait**, on reste largement dans les limites gratuites, l'analyse est plus
-rapide, et **n'importe quel** modèle texte Groq fonctionne.
+En faisant l'**OCR en local** et en n'envoyant que le **texte extrait**, on
+réduit fortement les tokens consommés. Gemini peut alors produire une réponse
+JSON plus longue sans la limite de sortie de 512 tokens rencontrée avec Groq.
 
 ## Démarrage
 
@@ -38,9 +36,9 @@ rapide, et **n'importe quel** modèle texte Groq fonctionne.
 # 1. Installer les dépendances
 npm install
 
-# 2. Configurer la clé API Groq (gratuite : https://console.groq.com/keys)
+# 2. Configurer la clé API Gemini (gratuite : https://aistudio.google.com/apikey)
 cp .env.example .env.local
-# puis éditer .env.local et renseigner GROQ_API_KEY
+# puis éditer .env.local et renseigner GEMINI_API_KEY
 
 # 3. Lancer en développement
 npm run dev
@@ -52,9 +50,8 @@ Ouvrir http://localhost:3000.
 
 | Variable          | Description                                          | Défaut                     |
 | ----------------- | ---------------------------------------------------- | -------------------------- |
-| `GROQ_API_KEY`    | Clé API Groq (gratuite)                              | —                          |
-| `GROQ_MODEL`      | Modèle **texte** Groq                                | `llama-3.3-70b-versatile`  |
-| `GROQ_MAX_TOKENS` | Tokens de sortie max (baisser en cas d'erreur 429)  | `1024`                     |
+| `GEMINI_API_KEY`  | Clé API Gemini (quota gratuit)                       | —                          |
+| `GEMINI_MODEL`    | Modèle **texte** Gemini                              | `gemini-2.5-flash-lite`   |
 
 ## Architecture
 
@@ -62,7 +59,7 @@ Ouvrir http://localhost:3000.
 app/
   page.tsx              Interface : profil + import + résultats
   layout.tsx            Layout racine
-  api/analyze/route.ts  Appel Groq (texte) → JSON structuré
+  api/analyze/route.ts  Appel Gemini (texte) → JSON structuré
 components/
   ResultView.tsx        Affichage de l'analyse
 lib/
