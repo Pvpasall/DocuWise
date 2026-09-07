@@ -3,7 +3,13 @@
 import { useState } from "react";
 import type { AnalyseResult } from "@/lib/types";
 
-export function ResultView({ result }: { result: AnalyseResult }) {
+export function ResultView({
+  result,
+  texteExtrait,
+}: {
+  result: AnalyseResult;
+  texteExtrait: string;
+}) {
   return (
     <div className="space-y-4">
       {/* En-tête : type + démarche détectés */}
@@ -97,7 +103,7 @@ export function ResultView({ result }: { result: AnalyseResult }) {
       )}
 
       {/* Texte OCR (repliable) */}
-      <OcrBlock texte={result.texteExtrait} />
+      <OcrBlock texte={texteExtrait} />
 
       {/* Limites */}
       <div className="rounded-xl border border-slate-200 bg-slate-100 p-4 text-xs text-slate-600">

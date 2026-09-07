@@ -21,8 +21,16 @@ pré-remplissage — sans jamais remplacer l'administration.
 ## Stack (100 % gratuit)
 
 - **Next.js 14** (App Router) + **Tailwind CSS**
-- **Groq** (tier gratuit) avec un modèle **vision Llama 4** : OCR + compréhension en une passe
-- **pdfjs-dist** : rendu de la 1re page d'un PDF en image, côté navigateur (aucun service payant)
+- **OCR local, gratuit** : couche texte des PDF via **pdfjs-dist**, OCR des images / PDF scannés via **Tesseract.js** (aucun token consommé)
+- **Groq** (tier gratuit) avec un **modèle texte** (défaut `llama-3.3-70b-versatile`) pour l'explication et le guidage
+
+### Pourquoi OCR local + modèle texte (et pas un modèle vision) ?
+
+Le tier gratuit de Groq impose des limites strictes de tokens/minute. Envoyer
+l'image au modèle (vision) fait exploser ces limites (erreurs 429) et impose un
+modèle vision. En faisant l'**OCR en local** et en n'envoyant que le **texte
+extrait**, on reste largement dans les limites gratuites, l'analyse est plus
+rapide, et **n'importe quel** modèle texte Groq fonctionne.
 
 ## Démarrage
 
@@ -42,10 +50,11 @@ Ouvrir http://localhost:3000.
 
 ## Variables d'environnement
 
-| Variable        | Description                                   | Défaut                                        |
-| --------------- | --------------------------------------------- | --------------------------------------------- |
-| `GROQ_API_KEY`  | Clé API Groq (gratuite)                       | —                                             |
-| `GROQ_MODEL`    | Modèle vision Groq                            | `meta-llama/llama-4-scout-17b-16e-instruct`   |
+| Variable          | Description                                          | Défaut                     |
+| ----------------- | ---------------------------------------------------- | -------------------------- |
+| `GROQ_API_KEY`    | Clé API Groq (gratuite)                              | —                          |
+| `GROQ_MODEL`      | Modèle **texte** Groq                                | `llama-3.3-70b-versatile`  |
+| `GROQ_MAX_TOKENS` | Tokens de sortie max (baisser en cas d'erreur 429)  | `1024`                     |
 
 ## Architecture
 
@@ -53,12 +62,12 @@ Ouvrir http://localhost:3000.
 app/
   page.tsx              Interface : profil + import + résultats
   layout.tsx            Layout racine
-  api/analyze/route.ts  Appel Groq (vision) → JSON structuré
+  api/analyze/route.ts  Appel Groq (texte) → JSON structuré
 components/
   ResultView.tsx        Affichage de l'analyse
 lib/
   prompt.ts             Prompt système + connaissance métier (titre de séjour)
-  fileToImage.ts        Conversion fichier (image/PDF) → data URL image
+  extractText.ts        OCR local : pdfjs (texte) + Tesseract.js (images/scans)
   types.ts              Types du résultat d'analyse
 ```
 

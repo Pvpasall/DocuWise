@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { fileToImageDataUrl } from "@/lib/fileToImage";
+import { extractText } from "@/lib/extractText";
 import type { AnalyseResult } from "@/lib/types";
 import type { UserProfile } from "@/lib/prompt";
 import { ResultView } from "@/components/ResultView";
@@ -20,6 +20,8 @@ export default function Home() {
     demarche: DEMARCHES[0],
   });
   const [preview, setPreview] = useState<string | null>(null);
+  const [texteExtrait, setTexteExtrait] = useState<string>("");
+  const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalyseResult | null>(null);
@@ -27,32 +29,46 @@ export default function Home() {
   async function handleFile(file: File) {
     setError(null);
     setResult(null);
-    try {
-      const dataUrl = await fileToImageDataUrl(file);
-      setPreview(dataUrl);
-      await analyze(dataUrl);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Erreur inconnue.");
-    }
-  }
-
-  async function analyze(imageDataUrl: string) {
+    setTexteExtrait("");
     setLoading(true);
-    setError(null);
     try {
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageDataUrl, profile }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Analyse impossible.");
-      setResult(data.result as AnalyseResult);
+      // 1) Extraction locale (OCR / couche texte) — gratuit, aucun token.
+      const { texte, apercu, methode } = await extractText(file, (etape) =>
+        setStatus(etape)
+      );
+      setPreview(apercu);
+      setTexteExtrait(texte);
+
+      if (texte.trim().length < 3) {
+        throw new Error(
+          "Aucun texte lisible détecté. Essaie une image plus nette."
+        );
+      }
+
+      // 2) Analyse par le modèle (texte seulement).
+      setStatus(
+        methode === "ocr"
+          ? "Analyse par l'IA (après OCR)…"
+          : "Analyse par l'IA…"
+      );
+      await analyze(texte);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur inconnue.");
     } finally {
       setLoading(false);
+      setStatus(null);
     }
+  }
+
+  async function analyze(texte: string) {
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ texteExtrait: texte, profile }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Analyse impossible.");
+    setResult(data.result as AnalyseResult);
   }
 
   return (
@@ -155,7 +171,7 @@ export default function Home() {
           {loading && (
             <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-6 text-slate-600 shadow-sm">
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
-              DocuWise lit votre document…
+              {status || "Traitement…"}
             </div>
           )}
 
@@ -165,7 +181,7 @@ export default function Home() {
             </div>
           )}
 
-          {result && <ResultView result={result} />}
+          {result && <ResultView result={result} texteExtrait={texteExtrait} />}
         </section>
       </div>
 

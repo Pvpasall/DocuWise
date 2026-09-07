@@ -11,10 +11,11 @@ export type Justificatif = {
   note: string | null;
 };
 
+// Analyse renvoyée par le modèle. Le texte OCR n'y figure pas : il est produit
+// localement (Tesseract / pdfjs) et affiché côté client.
 export type AnalyseResult = {
   typeDocument: string;
   demarcheDetectee: string;
-  texteExtrait: string;
   explicationSimple: string;
   champs: Champ[];
   justificatifsRequis: Justificatif[];
