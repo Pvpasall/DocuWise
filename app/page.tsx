@@ -72,29 +72,49 @@ export default function Home() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
-      <header className="mb-8">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">📄</span>
-          <h1 className="text-2xl font-bold text-slate-900">DocuWise</h1>
+    <main className="site-shell">
+      <nav className="topbar">
+        <div className="wordmark"><span className="wordmark-mark">D</span> DocuWise</div>
+        <div className="topbar-note"><span className="status-dot" /> Assistant administratif pour les nouveaux arrivants</div>
+      </nav>
+
+      <header className="hero">
+        <div className="hero-copy">
+          <p className="eyebrow">Votre dossier, enfin lisible</p>
+          <h1>Comprendre ses démarches.<br /><em>Agir avec confiance.</em></h1>
+          <p className="hero-lede">DocuWise lit vos documents administratifs, explique ce qui est demandé et vous aide à préparer la prochaine étape.</p>
+          <div className="hero-proof">
+            <span className="proof-icon">✓</span>
+            <span><strong>Simple, guidé, confidentiel.</strong><br />L&apos;IA assiste. Vous gardez le dernier mot.</span>
+          </div>
         </div>
-        <p className="mt-1 text-slate-600">
-          Importez un document administratif : DocuWise le lit, vous l'explique
-          simplement et vous indique les justificatifs à préparer.
-        </p>
+        <div className="hero-stamp">
+          <span className="stamp-number">01</span>
+          <span>Un document<br />à décoder ?</span>
+          <span className="stamp-arrow">↘</span>
+        </div>
       </header>
 
-      <div className="grid gap-6 md:grid-cols-[320px,1fr]">
-        {/* Colonne gauche : profil + import */}
-        <section className="space-y-6">
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Votre situation
-            </h2>
+      <div className="process-strip" aria-label="Parcours DocuWise">
+        <div className="process-item active"><span>01</span><div><strong>Décrivez votre situation</strong><small>Quelques informations utiles</small></div></div>
+        <div className="process-line" />
+        <div className="process-item"><span>02</span><div><strong>Importez un document</strong><small>PDF, JPG ou PNG</small></div></div>
+        <div className="process-line" />
+        <div className="process-item"><span>03</span><div><strong>Recevez votre feuille de route</strong><small>Explication, pièces et alertes</small></div></div>
+      </div>
+
+      <div className="workspace-grid">
+        <section className="sidebar-panel">
+          <div className="section-heading">
+            <span className="section-kicker">Étape 01</span>
+            <h2>Votre situation</h2>
+            <p>Ces éléments permettent de personnaliser les explications.</p>
+          </div>
+          <div className="form-stack">
             <label className="mb-3 block text-sm">
-              <span className="mb-1 block text-slate-600">Statut</span>
+              <span className="field-label">Statut</span>
               <input
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className="field-input"
                 value={profile.statut}
                 onChange={(e) =>
                   setProfile({ ...profile, statut: e.target.value })
@@ -102,9 +122,9 @@ export default function Home() {
               />
             </label>
             <label className="mb-3 block text-sm">
-              <span className="mb-1 block text-slate-600">Nationalité</span>
+              <span className="field-label">Nationalité <small>optionnel</small></span>
               <input
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className="field-input"
                 placeholder="ex. Sénégalaise"
                 value={profile.nationalite}
                 onChange={(e) =>
@@ -113,12 +133,10 @@ export default function Home() {
               />
             </label>
             <label className="mb-3 block text-sm">
-              <span className="mb-1 block text-slate-600">
-                Date d'arrivée en France
-              </span>
+              <span className="field-label">Date d&apos;arrivée en France <small>optionnel</small></span>
               <input
                 type="month"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className="field-input"
                 value={profile.dateArrivee}
                 onChange={(e) =>
                   setProfile({ ...profile, dateArrivee: e.target.value })
@@ -126,9 +144,9 @@ export default function Home() {
               />
             </label>
             <label className="block text-sm">
-              <span className="mb-1 block text-slate-600">Démarche</span>
+              <span className="field-label">Démarche à comprendre</span>
               <select
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className="field-input"
                 value={profile.demarche}
                 onChange={(e) =>
                   setProfile({ ...profile, demarche: e.target.value })
@@ -146,38 +164,37 @@ export default function Home() {
           <FileDrop onFile={handleFile} disabled={loading} />
 
           {preview && (
-            <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-              <p className="mb-2 text-xs font-medium text-slate-500">
-                Document importé
-              </p>
+            <div className="preview-panel">
+              <p className="preview-label"><span className="status-dot" /> Document importé</p>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={preview}
                 alt="Aperçu du document"
-                className="max-h-64 w-full rounded-lg object-contain"
+                className="preview-image"
               />
             </div>
           )}
         </section>
 
-        {/* Colonne droite : résultats */}
-        <section>
+        <section className="results-panel">
           {error && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <div className="error-panel">
               {error}
             </div>
           )}
 
           {loading && (
-            <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-6 text-slate-600 shadow-sm">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
-              {status || "Traitement…"}
+            <div className="loading-panel">
+              <span className="loader-ring" /><div><strong>DocuWise lit votre document</strong><span>{status || "Traitement…"}</span></div>
             </div>
           )}
 
           {!loading && !result && !error && (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
-              Importez un document pour voir l'analyse ici.
+            <div className="empty-panel">
+              <div className="empty-illustration"><span>✦</span><span>▤</span><span>→</span></div>
+              <p className="section-kicker">Votre espace de clarté</p>
+              <h2>Votre analyse apparaîtra ici</h2>
+              <p>Commencez par renseigner votre situation, puis déposez le document qui vous pose question.</p>
             </div>
           )}
 
@@ -185,10 +202,8 @@ export default function Home() {
         </section>
       </div>
 
-      <footer className="mt-10 border-t border-slate-200 pt-4 text-xs text-slate-400">
-        DocuWise est un assistant : il vous aide à comprendre, il ne décide pas à
-        la place de l'administration. Vérifiez toujours les informations sur les
-        canaux officiels (ANEF, service-public.fr, votre préfecture).
+      <footer className="site-footer">
+        <span>DOCUWISE / PROTOTYPE</span><span>Un assistant, pas une administration. Vérifiez toujours sur ANEF, service-public.fr ou auprès de votre préfecture.</span>
       </footer>
     </main>
   );
@@ -216,19 +231,16 @@ function FileDrop({
         const f = e.dataTransfer.files?.[0];
         if (f) onFile(f);
       }}
-      className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition ${
+      className={`upload-zone ${
         dragging
-          ? "border-brand-500 bg-brand-50"
-          : "border-slate-300 bg-white hover:border-brand-500"
-      } ${disabled ? "pointer-events-none opacity-50" : ""}`}
+          ? "upload-zone-active"
+          : ""
+      } ${disabled ? "upload-zone-disabled" : ""}`}
     >
-      <span className="text-3xl">⬆️</span>
-      <span className="mt-2 text-sm font-medium text-slate-700">
-        Importer un document
-      </span>
-      <span className="mt-1 text-xs text-slate-500">
-        Glissez-déposez ou cliquez — JPG, PNG ou PDF
-      </span>
+      <span className="upload-icon">↑</span>
+      <span className="upload-title">Déposez votre document ici</span>
+      <span className="upload-action">ou choisissez un fichier <b>→</b></span>
+      <span className="upload-meta">PDF, JPG ou PNG · traitement local de l&apos;OCR</span>
       <input
         type="file"
         accept="image/*,application/pdf"

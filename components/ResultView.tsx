@@ -11,38 +11,37 @@ export function ResultView({
   texteExtrait: string;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="result-stack">
       {/* En-tête : type + démarche détectés */}
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="result-hero">
+        <div className="result-tags">
           <Badge>{result.typeDocument}</Badge>
           <Badge tone="brand">{result.demarcheDetectee}</Badge>
         </div>
-        <h2 className="mt-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-          Ce que signifie ce document
-        </h2>
-        <p className="mt-1 leading-relaxed text-slate-800">
+        <p className="result-kicker">Lecture DocuWise · voici l&apos;essentiel</p>
+        <h2 className="result-title">Ce que signifie ce document</h2>
+        <p className="result-summary">
           {result.explicationSimple}
         </p>
       </div>
 
       {/* Champs pré-remplissables */}
       {result.champs?.length > 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+        <div className="result-card">
+          <h2 className="result-card-title">
             Informations & pré-remplissage
           </h2>
-          <div className="space-y-3">
+          <div className="result-fields">
             {result.champs.map((c, i) => (
               <div
                 key={i}
-                className="flex flex-col gap-1 rounded-lg bg-slate-50 p-3 sm:flex-row sm:items-center sm:justify-between"
+                className="result-field"
               >
                 <div>
-                  <p className="text-sm font-medium text-slate-700">
+                  <p className="result-field-label">
                     {c.libelle}
                   </p>
-                  <p className="text-sm text-slate-500">
+                  <p className="result-field-value">
                     {c.valeurProposee || c.valeurExtraite || (
                       <span className="italic">à compléter</span>
                     )}
@@ -54,7 +53,7 @@ export function ResultView({
               </div>
             ))}
           </div>
-          <p className="mt-3 text-xs text-slate-400">
+          <p className="result-note">
             Ces valeurs sont des propositions. Vérifiez et corrigez chaque champ
             avant de valider sur le site officiel.
           </p>
@@ -63,21 +62,21 @@ export function ResultView({
 
       {/* Justificatifs */}
       {result.justificatifsRequis?.length > 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+        <div className="result-card">
+          <h2 className="result-card-title">
             Justificatifs à préparer
           </h2>
-          <ul className="space-y-2">
+          <ul className="result-checklist">
             {result.justificatifsRequis.map((j, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm">
-                <span className="mt-0.5">{j.obligatoire ? "✅" : "▫️"}</span>
+              <li key={i}>
+                  <span className={`checkmark ${j.obligatoire ? "required" : ""}`}>{j.obligatoire ? "✓" : "·"}</span>
                 <span>
-                  <span className="font-medium text-slate-800">{j.nom}</span>
+                    <span className="check-name">{j.nom}</span>
                   {!j.obligatoire && (
-                    <span className="text-slate-400"> (si applicable)</span>
+                    <span className="optional"> (si applicable)</span>
                   )}
                   {j.note && (
-                    <span className="block text-xs text-slate-500">
+                    <span className="check-note">
                       {j.note}
                     </span>
                   )}
@@ -90,11 +89,11 @@ export function ResultView({
 
       {/* Alertes */}
       {result.alertes?.length > 0 && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
-          <h2 className="mb-2 text-sm font-semibold text-amber-800">
-            ⚠️ À ne pas oublier
+        <div className="alert-card">
+          <h2>
+            <span>!</span> À ne pas oublier
           </h2>
-          <ul className="list-inside list-disc space-y-1 text-sm text-amber-800">
+          <ul>
             {result.alertes.map((a, i) => (
               <li key={i}>{a}</li>
             ))}
@@ -116,16 +115,16 @@ export function ResultView({
 function OcrBlock({ texte }: { texte: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="ocr-card">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between p-4 text-left text-sm font-semibold uppercase tracking-wide text-slate-500"
+        className="ocr-toggle"
       >
         Texte extrait du document (OCR)
-        <span>{open ? "▲" : "▼"}</span>
+        <span>{open ? "−" : "+"}</span>
       </button>
       {open && (
-        <pre className="max-h-72 overflow-auto whitespace-pre-wrap border-t border-slate-100 p-4 text-xs text-slate-700">
+        <pre className="ocr-text">
           {texte || "(aucun texte détecté)"}
         </pre>
       )}
