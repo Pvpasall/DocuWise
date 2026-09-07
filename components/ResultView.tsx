@@ -59,7 +59,6 @@ export function ResultView({
       )}
 
       {/* Texte OCR (repliable) */}
-      <OcrBlock texte={texteExtrait} />
 
       {/* Limites */}
       <div className="limits-card reveal" style={revealDelay(4)}>
